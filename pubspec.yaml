@@ -37,6 +37,11 @@ dependencies:
   firebase_core: ^2.16.0
   firebase_auth: ^4.10.0
   fluttertoast: ^8.2.2
+  file_picker: ^6.0.0
+  fluttericon: ^2.0.0
+  get: ^4.6.6
+  animate_do: ^3.1.2
+  table_calendar: ^3.0.9
 
 dev_dependencies:
   flutter_test:
