@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:to_do_app/pages/dashboard_page.dart';
+import 'package:to_do_app/pages/datamanage_page.dart';
+import 'package:to_do_app/pages/taskadd_page.dart';
 import 'pages/login_page.dart';
 
 void main() {
