@@ -90,7 +90,41 @@ class _NoteListViewState extends State<NoteListView> {
   }
 
   void _editNote(BuildContext context, Note note) {
-    // add
+    // Add your edit note logic here
+  }
+
+  void _deleteNoteConfirmation(BuildContext context, int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Task?'),
+          content: Text('Are you sure you want to delete this task?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  // Remove the task from the list
+                  sampleNotes.removeAt(index);
+                  _completedTasks.removeAt(index);
+                });
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'Delete',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -100,141 +134,136 @@ class _NoteListViewState extends State<NoteListView> {
 
     for (int index = 0; index < sampleNotes.length; index++) {
       if (_completedTasks[index]) {
-        completedTasksWidgets.add(Card(
-          elevation: 4,
-          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+        completedTasksWidgets.add(ListTile(
+          contentPadding: EdgeInsets.all(16),
+          title: Text(
+            sampleNotes[index].title,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey, // Grey out completed tasks
+              decoration: TextDecoration.lineThrough,
+            ),
           ),
-          child: ListTile(
-            contentPadding: EdgeInsets.all(16),
-            title: Text(
-              sampleNotes[index].title,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey, // Grey out completed tasks
-                decoration: TextDecoration.lineThrough,
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              SizedBox(height: 8),
+              Row(
+                children: [
+                  Icon(
+                    Icons.calendar_today,
+                    size: 16,
+                    color: Colors.grey,
+                  ),
+                  SizedBox(width: 8),
+                  Text(sampleNotes[index].dueDate),
+                ],
               ),
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                SizedBox(height: 8),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.calendar_today,
-                      size: 16,
-                      color: Colors.grey,
-                    ),
-                    SizedBox(width: 8),
-                    Text(sampleNotes[index].dueDate),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.priority_high,
-                      size: 16,
-                      color: Colors.orange,
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      '${_getPriorityText(sampleNotes[index].priority)}',
-                      style: TextStyle(color: Colors.orange),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.category,
-                      size: 16,
-                      color: Colors.green,
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      '${sampleNotes[index].category}',
-                      style: TextStyle(color: Colors.green),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+              Row(
+                children: [
+                  Icon(
+                    Icons.priority_high,
+                    size: 16,
+                    color: Colors.orange,
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    '${_getPriorityText(sampleNotes[index].priority)}',
+                    style: TextStyle(color: Colors.orange),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Icon(
+                    Icons.category,
+                    size: 16,
+                    color: Colors.green,
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    '${sampleNotes[index].category}',
+                    style: TextStyle(color: Colors.green),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          trailing: IconButton(
+            icon: Icon(Icons.delete, color: Colors.red),
+            onPressed: () {
+              _deleteNoteConfirmation(context, index);
+            },
           ),
         ));
       } else {
-        activeTasksWidgets.add(Card(
-          elevation: 4,
-          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+        activeTasksWidgets.add(ListTile(
+          contentPadding: EdgeInsets.all(16),
+          leading: Checkbox(
+            value: _completedTasks[index],
+            onChanged: (value) {
+              setState(() {
+                _completedTasks[index] = value!;
+              });
+            },
           ),
-          child: ListTile(
-            contentPadding: EdgeInsets.all(16),
-            leading: Checkbox(
-              value: _completedTasks[index],
-              onChanged: (value) {
-                setState(() {
-                  _completedTasks[index] = value!;
-                });
-              },
+          title: Text(
+            sampleNotes[index].title,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
             ),
-            title: Text(
-              sampleNotes[index].title,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+          ),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              SizedBox(height: 8),
+              Row(
+                children: [
+                  Icon(
+                    Icons.calendar_today,
+                    size: 16,
+                    color: Colors.grey,
+                  ),
+                  SizedBox(width: 8),
+                  Text(sampleNotes[index].dueDate),
+                ],
               ),
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                SizedBox(height: 8),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.calendar_today,
-                      size: 16,
-                      color: Colors.grey,
-                    ),
-                    SizedBox(width: 8),
-                    Text(sampleNotes[index].dueDate),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.priority_high,
-                      size: 16,
-                      color: Colors.orange,
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      '${_getPriorityText(sampleNotes[index].priority)}',
-                      style: TextStyle(color: Colors.orange),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.category,
-                      size: 16,
-                      color: Colors.green,
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      '${sampleNotes[index].category}',
-                      style: TextStyle(color: Colors.green),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            onTap: () {
-              _editNote(context, sampleNotes[index]);
+              Row(
+                children: [
+                  Icon(
+                    Icons.priority_high,
+                    size: 16,
+                    color: Colors.orange,
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    '${_getPriorityText(sampleNotes[index].priority)}',
+                    style: TextStyle(color: Colors.orange),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Icon(
+                    Icons.category,
+                    size: 16,
+                    color: Colors.green,
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    '${sampleNotes[index].category}',
+                    style: TextStyle(color: Colors.green),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          trailing: IconButton(
+            icon: Icon(Icons.delete, color: Colors.red),
+            onPressed: () {
+              _deleteNoteConfirmation(context, index);
             },
           ),
         ));
