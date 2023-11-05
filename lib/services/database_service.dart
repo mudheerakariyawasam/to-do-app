@@ -15,7 +15,7 @@ class DatabaseService {
     await _db.collection(collection).doc(id).delete();
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> read(String collection) {
+  Stream<QuerySnapshot<Map<String, dynamic>>> readAll(String collection) {
     return _db.collection(collection).snapshots();
   }
 
