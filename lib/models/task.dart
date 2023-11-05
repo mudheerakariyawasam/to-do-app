@@ -3,6 +3,7 @@ import 'package:to_do_app/services/database_service.dart';
 
 class TaskModel {
   String userId = '';
+  String id = '';
   String title;
   String description;
   List<String> tags = [];
@@ -22,13 +23,6 @@ class TaskModel {
     required this.category,
     required this.priority,
     required this.isCompleted,
-  });
-
-  TaskModel.forTest({
-    required this.title,
-    required this.description,
-    required this.priority,
-    required this.dueDate,
   });
 
   TaskModel.fromJson(Map<String, dynamic> json)
@@ -72,5 +66,10 @@ class TaskModel {
   Stream<TaskModel> readById(String id) {
     return _db.readById(collection, id).map((snapshot) =>
         TaskModel.fromJson(snapshot.data() as Map<String, dynamic>));
+  }
+
+  // mark task as completed in database
+  Future<void> markAsCompleted(String id) async {
+    await _db.update(collection, id, {'isCompleted': true});
   }
 }

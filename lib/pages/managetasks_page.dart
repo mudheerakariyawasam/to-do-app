@@ -1,5 +1,8 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../models/note.dart';
+import 'package:to_do_app/models/task.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -12,10 +15,10 @@ class TaskListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Note List'),
+        title: const Text('Tasks List'),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.search),
+            icon: const Icon(Icons.search),
             onPressed: () {
               showSearch(context: context, delegate: NoteSearchDelegate());
             },
@@ -32,7 +35,7 @@ class NoteSearchDelegate extends SearchDelegate<String> {
   List<Widget> buildActions(BuildContext context) {
     return [
       IconButton(
-        icon: Icon(Icons.clear),
+        icon: const Icon(Icons.clear),
         onPressed: () {
           query = '';
         },
@@ -43,7 +46,7 @@ class NoteSearchDelegate extends SearchDelegate<String> {
   @override
   Widget buildLeading(BuildContext context) {
     return IconButton(
-      icon: Icon(Icons.arrow_back),
+      icon: const Icon(Icons.arrow_back),
       onPressed: () {
         close(context, '');
       },
@@ -61,7 +64,7 @@ class NoteSearchDelegate extends SearchDelegate<String> {
   @override
   Widget buildSuggestions(BuildContext context) {
     // Implement your search suggestions logic and return the suggestions as widgets here
-    return Center(
+    return const Center(
       child: Text('Start typing to search'),
     );
   }
@@ -73,8 +76,13 @@ class NoteListView extends StatefulWidget {
 }
 
 class _NoteListViewState extends State<NoteListView> {
-  List<bool> _completedTasks =
-      List.generate(sampleNotes.length, (index) => false);
+  // final List<bool> _completedTasks =
+  //     List.generate(sampleNotes.length, (index) => false);
+  List<bool> _completedTasks = [];
+  List<TaskModel> allTasks = [];
+
+  List<Widget> completedTasksWidgets = [];
+  List<Widget> activeTasksWidgets = [];
 
   String _getPriorityText(int priority) {
     switch (priority) {
@@ -89,152 +97,209 @@ class _NoteListViewState extends State<NoteListView> {
     }
   }
 
-  void _editNote(BuildContext context, Note note) {
-    // add
+  void getTasks() async {
+    debugPrint('getting tasks');
+    Stream<QuerySnapshot<Map<String, dynamic>>> snapshot = TaskModel.readAll();
+
+    snapshot.listen((QuerySnapshot<Map<String, dynamic>> snapshot) {
+      List<Map<String, dynamic>> documents =
+          snapshot.docs.map((document) => document.data()).toList();
+      debugPrint('documents: $documents');
+      try {
+        List<TaskModel> tasks =
+            documents.map((document) => TaskModel.fromJson(document)).toList();
+
+        setState(() {
+          // if task.isCompleted is true, add true to _completedTasks. otherwise, add false
+          _completedTasks = tasks.map((task) => task.isCompleted).toList();
+          allTasks = tasks;
+        });
+      } catch (e) {
+        debugPrint('error in getting tasks $e');
+      }
+    });
+  }
+
+  void _editNote(BuildContext context, TaskModel task) {
+    // edit task logic
+  }
+
+  void _deleteNoteConfirmation(BuildContext context, int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Task?'),
+          content: const Text('Are you sure you want to delete this task?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  // Remove the task from the list
+                  allTasks.removeAt(index);
+                  _completedTasks.removeAt(index);
+                });
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                'Delete',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getTasks();
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> completedTasksWidgets = [];
-    List<Widget> activeTasksWidgets = [];
-
-    for (int index = 0; index < sampleNotes.length; index++) {
+    completedTasksWidgets.clear();
+    activeTasksWidgets.clear();
+    for (int index = 0; index < allTasks.length; index++) {
       if (_completedTasks[index]) {
-        completedTasksWidgets.add(Card(
-          elevation: 4,
-          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+        completedTasksWidgets.add(ListTile(
+          contentPadding: const EdgeInsets.all(16),
+          title: Text(
+            allTasks[index].title,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey, // Grey out completed tasks
+              decoration: TextDecoration.lineThrough,
+            ),
           ),
-          child: ListTile(
-            contentPadding: EdgeInsets.all(16),
-            title: Text(
-              sampleNotes[index].title,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey, // Grey out completed tasks
-                decoration: TextDecoration.lineThrough,
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.calendar_today,
+                    size: 16,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(allTasks[index].dueDate),
+                ],
               ),
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                SizedBox(height: 8),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.calendar_today,
-                      size: 16,
-                      color: Colors.grey,
-                    ),
-                    SizedBox(width: 8),
-                    Text(sampleNotes[index].dueDate),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.priority_high,
-                      size: 16,
-                      color: Colors.orange,
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      '${_getPriorityText(sampleNotes[index].priority)}',
-                      style: TextStyle(color: Colors.orange),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.category,
-                      size: 16,
-                      color: Colors.green,
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      '${sampleNotes[index].category}',
-                      style: TextStyle(color: Colors.green),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.priority_high,
+                    size: 16,
+                    color: Colors.orange,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    _getPriorityText(allTasks[index].priority),
+                    style: const TextStyle(color: Colors.orange),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.category,
+                    size: 16,
+                    color: Colors.green,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    allTasks[index].category,
+                    style: const TextStyle(color: Colors.green),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          trailing: IconButton(
+            icon: const Icon(Icons.delete, color: Colors.red),
+            onPressed: () {
+              _deleteNoteConfirmation(context, index);
+            },
           ),
         ));
       } else {
-        activeTasksWidgets.add(Card(
-          elevation: 4,
-          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+        activeTasksWidgets.add(ListTile(
+          contentPadding: const EdgeInsets.all(16),
+          leading: Checkbox(
+            value: _completedTasks[index],
+            onChanged: (value) {
+              setState(() {
+                _completedTasks[index] = value!;
+              });
+            },
           ),
-          child: ListTile(
-            contentPadding: EdgeInsets.all(16),
-            leading: Checkbox(
-              value: _completedTasks[index],
-              onChanged: (value) {
-                setState(() {
-                  _completedTasks[index] = value!;
-                });
-              },
+          title: Text(
+            allTasks[index].title,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
             ),
-            title: Text(
-              sampleNotes[index].title,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+          ),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.calendar_today,
+                    size: 16,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(allTasks[index].dueDate),
+                ],
               ),
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                SizedBox(height: 8),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.calendar_today,
-                      size: 16,
-                      color: Colors.grey,
-                    ),
-                    SizedBox(width: 8),
-                    Text(sampleNotes[index].dueDate),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.priority_high,
-                      size: 16,
-                      color: Colors.orange,
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      '${_getPriorityText(sampleNotes[index].priority)}',
-                      style: TextStyle(color: Colors.orange),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.category,
-                      size: 16,
-                      color: Colors.green,
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      '${sampleNotes[index].category}',
-                      style: TextStyle(color: Colors.green),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            onTap: () {
-              _editNote(context, sampleNotes[index]);
+              Row(
+                children: [
+                  const Icon(
+                    Icons.priority_high,
+                    size: 16,
+                    color: Colors.orange,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    _getPriorityText(allTasks[index].priority),
+                    style: const TextStyle(color: Colors.orange),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.category,
+                    size: 16,
+                    color: Colors.green,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    allTasks[index].category,
+                    style: const TextStyle(color: Colors.green),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          trailing: IconButton(
+            icon: const Icon(Icons.delete, color: Colors.red),
+            onPressed: () {
+              _deleteNoteConfirmation(context, index);
             },
           ),
         ));
@@ -244,7 +309,7 @@ class _NoteListViewState extends State<NoteListView> {
     return ListView(
       children: [
         ExpansionTile(
-          title: Text('Completed Tasks'),
+          title: const Text('Completed Tasks'),
           children: completedTasksWidgets,
         ),
         ...activeTasksWidgets,

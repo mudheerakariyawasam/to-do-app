@@ -38,25 +38,6 @@ class _TaskManagementAppState extends State<TaskManagementApp> {
     }
   }
 
-  void getTasks() async {
-    Stream<QuerySnapshot<Map<String, dynamic>>> snapshot = TaskModel.readAll();
-    snapshot.listen((QuerySnapshot<Map<String, dynamic>> snapshot) {
-      List<Map<String, dynamic>> documents =
-          snapshot.docs.map((document) => document.data()).toList();
-
-      try {
-        List<TaskModel> tasks =
-            documents.map((document) => TaskModel.fromJson(document)).toList();
-
-        setState(() {
-          this.tasks = tasks;
-        });
-      } catch (e) {
-        debugPrint('error in getting tasks $e');
-      }
-    });
-  }
-
   void addTask() {
     debugPrint('adding task');
     String title = titleController.text;
@@ -115,7 +96,6 @@ class _TaskManagementAppState extends State<TaskManagementApp> {
   @override
   void initState() {
     super.initState();
-    getTasks();
   }
 
   @override
