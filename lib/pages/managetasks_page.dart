@@ -90,15 +90,82 @@ class _NoteListViewState extends State<NoteListView> {
   }
 
   void _editNote(BuildContext context, Note note) {
-    // ... (your existing edit note logic)
+    // add
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: sampleNotes.length,
-      itemBuilder: (context, index) {
-        return Card(
+    List<Widget> completedTasksWidgets = [];
+    List<Widget> activeTasksWidgets = [];
+
+    for (int index = 0; index < sampleNotes.length; index++) {
+      if (_completedTasks[index]) {
+        completedTasksWidgets.add(Card(
+          elevation: 4,
+          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: ListTile(
+            contentPadding: EdgeInsets.all(16),
+            title: Text(
+              sampleNotes[index].title,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey, // Grey out completed tasks
+                decoration: TextDecoration.lineThrough,
+              ),
+            ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                SizedBox(height: 8),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_today,
+                      size: 16,
+                      color: Colors.grey,
+                    ),
+                    SizedBox(width: 8),
+                    Text(sampleNotes[index].dueDate),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.priority_high,
+                      size: 16,
+                      color: Colors.orange,
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      '${_getPriorityText(sampleNotes[index].priority)}',
+                      style: TextStyle(color: Colors.orange),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.category,
+                      size: 16,
+                      color: Colors.green,
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      '${sampleNotes[index].category}',
+                      style: TextStyle(color: Colors.green),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ));
+      } else {
+        activeTasksWidgets.add(Card(
           elevation: 4,
           margin: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           shape: RoundedRectangleBorder(
@@ -119,8 +186,6 @@ class _NoteListViewState extends State<NoteListView> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                decoration:
-                    _completedTasks[index] ? TextDecoration.lineThrough : null,
               ),
             ),
             subtitle: Column(
@@ -172,8 +237,18 @@ class _NoteListViewState extends State<NoteListView> {
               _editNote(context, sampleNotes[index]);
             },
           ),
-        );
-      },
+        ));
+      }
+    }
+
+    return ListView(
+      children: [
+        ExpansionTile(
+          title: Text('Completed Tasks'),
+          children: completedTasksWidgets,
+        ),
+        ...activeTasksWidgets,
+      ],
     );
   }
 }
