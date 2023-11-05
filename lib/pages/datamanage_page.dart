@@ -10,7 +10,7 @@ class DataManagePage extends StatelessWidget {
     return Scaffold(
       body: Container(
         width: double.infinity,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
             gradient: LinearGradient(begin: Alignment.topCenter, colors: [
           Colors.blue,
           Colors.blue,
