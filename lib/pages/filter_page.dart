@@ -15,6 +15,18 @@ class _TaskListScreenState extends State<TaskListScreen> {
   ];
   List<String> selectedPriority = [];
   
+  Color getChipColor(String priority) {
+    switch (priority) {
+      case 'High':
+        return const Color.fromARGB(255, 236, 147, 141);
+      case 'Medium':
+        return const Color.fromARGB(255, 255, 248, 189);
+      case 'Low':
+        return const Color.fromARGB(255, 183, 255, 185);
+      default:
+        return Colors.grey;
+    }
+  }
   
   @override
   Widget build(BuildContext context) {
@@ -28,12 +40,27 @@ class _TaskListScreenState extends State<TaskListScreen> {
       ),
       body: Column(
         children: [
+          const SizedBox(height: 20),
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text(
+              'Filter by Priority',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
           Container(
             padding: const EdgeInsets.all(8.0),
             margin: const EdgeInsets.all(8.0),
+            
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly ,
-              children:priority.map((pty) => FilterChip(
+              children:
+              priority.map((pty) {
+                final isSelected = selectedPriority.contains(pty); 
+                return FilterChip(
                 selected:selectedPriority.contains(pty),
                 label:Text(pty), 
                 onSelected:(selected){
@@ -44,7 +71,9 @@ class _TaskListScreenState extends State<TaskListScreen> {
                             selectedPriority.remove(pty);
                           }
                   });
-                })).toList() ,
+                },
+                backgroundColor: getChipColor(pty) ,
+                );}).toList() ,
             ),
           ),
           Expanded(

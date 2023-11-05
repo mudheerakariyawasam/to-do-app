@@ -7,8 +7,8 @@ class Task {
 }
 
 final List<Task> tasks = [
-  Task(title: "Task 1", priority: "High", label: "Work"),
-  Task(title: "Task 2", priority: "Medium", label: "Home"),
-  Task(title: "Task 3", priority: "Low", label: "University"),
+  Task(title: "Complete HCI Assignment", priority: "High", label: "University"),
+  Task(title: "Do Java Tutorial for work", priority: "Medium", label: "Work"),
+  Task(title: "Go Grocery Shopping", priority: "Low", label: "Home"),
   // Add more tasks as needed
 ];
