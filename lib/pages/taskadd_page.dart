@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 void main() {
   runApp(MaterialApp(
@@ -14,7 +16,19 @@ class TaskManagementApp extends StatefulWidget {
 }
 
 class _TaskManagementAppState extends State<TaskManagementApp> {
+  String? _selectedImagePath;
   List<Task> tasks = [];
+
+  Future<void> _selectAttachment(BuildContext context) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImagePath = pickedFile.path;
+      });
+    }
+  }
 
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
@@ -46,7 +60,22 @@ class _TaskManagementAppState extends State<TaskManagementApp> {
             SizedBox(height: 10),
             _buildCategorySelector(context),
             SizedBox(height: 10),
-            _buildPrioritySelection(),
+            Row(
+              children: <Widget>[
+                Icon(Icons.attach_file,
+                    size: 28, color: Colors.blue), // Attachment icon
+                SizedBox(width: 10),
+              ],
+            ),
+            _selectedImagePath != null
+                ? Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Image.file(
+                      File(_selectedImagePath!),
+                      height: 100,
+                    ),
+                  )
+                : Container(),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
@@ -336,6 +365,7 @@ class Task {
   final String dueDate;
   final int priority;
   final String category;
+  final String? attachmentPath;
 
   Task({
     required this.title,
@@ -343,5 +373,6 @@ class Task {
     required this.dueDate,
     required this.priority,
     required this.category,
+    this.attachmentPath,
   });
 }
