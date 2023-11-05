@@ -22,7 +22,7 @@ class TaskListScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: NoteListView(),
+      body: NoteListView(filteredNotes: sampleNotes),
     );
   }
 }
@@ -52,29 +52,46 @@ class NoteSearchDelegate extends SearchDelegate<String> {
 
   @override
   Widget buildResults(BuildContext context) {
-    // Implement your search logic and return the results as widgets here
-    return Center(
-      child: Text('Search results for: $query'),
-    );
+    List<Note> filteredNotes = _updateFilter(query);
+    return NoteListView(filteredNotes: filteredNotes);
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    // Implement your search suggestions logic and return the suggestions as widgets here
-    return Center(
-      child: Text('Start typing to search'),
-    );
+    List<Note> filteredNotes = _updateFilter(query);
+    return NoteListView(filteredNotes: filteredNotes);
+  }
+
+  List<Note> _updateFilter(String query) {
+    if (query.isEmpty) {
+      return List.from(sampleNotes);
+    } else {
+      return sampleNotes
+          .where(
+              (note) => note.title.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    }
   }
 }
 
 class NoteListView extends StatefulWidget {
+  final List<Note> filteredNotes;
+
+  NoteListView({required this.filteredNotes});
+
   @override
   _NoteListViewState createState() => _NoteListViewState();
 }
 
 class _NoteListViewState extends State<NoteListView> {
-  List<bool> _completedTasks =
-      List.generate(sampleNotes.length, (index) => false);
+  late List<bool> _completedTasks;
+
+  @override
+  void initState() {
+    super.initState();
+    _completedTasks =
+        List.generate(widget.filteredNotes.length, (index) => false);
+  }
 
   String _getPriorityText(int priority) {
     switch (priority) {
@@ -88,6 +105,9 @@ class _NoteListViewState extends State<NoteListView> {
         return 'Unknown';
     }
   }
+
+  List<Note> filteredNotes =
+      List.from(sampleNotes); // Initialize with all notes
 
   void _editNote(BuildContext context, Note note) {
     // Add your edit note logic here
@@ -137,7 +157,7 @@ class _NoteListViewState extends State<NoteListView> {
         completedTasksWidgets.add(ListTile(
           contentPadding: EdgeInsets.all(16),
           title: Text(
-            sampleNotes[index].title,
+            widget.filteredNotes[index].title,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
