@@ -1,16 +1,16 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:fluttericon/font_awesome5_icons.dart';
 
 class DataManagePage extends StatelessWidget {
+  const DataManagePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
         width: double.infinity,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
             gradient: LinearGradient(begin: Alignment.topCenter, colors: [
           Colors.blue,
           Colors.blue,
@@ -78,22 +78,22 @@ class DataManagePage extends StatelessWidget {
                           ),
                           child: Column(
                             children: <Widget>[
-                              SizedBox(height: 20),
-                              Text(
+                              const SizedBox(height: 20),
+                              const Text(
                                 'Import Data:',
                                 style: TextStyle(
                                     fontSize: 16, fontWeight: FontWeight.bold),
                               ),
-                              SizedBox(height: 10),
+                              const SizedBox(height: 10),
                               ElevatedButton.icon(
                                 onPressed: () {},
-                                icon: Icon(FontAwesome5.file_upload),
-                                label: Text('Select a File'),
+                                icon: const Icon(FontAwesome5.file_upload),
+                                label: const Text('Select a File'),
                                 style: ElevatedButton.styleFrom(
-                                  primary: Colors.blue,
+                                  backgroundColor: Colors.blue,
                                 ),
                               ),
-                              SizedBox(height: 10),
+                              const SizedBox(height: 10),
                               Container(
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
@@ -127,24 +127,24 @@ class DataManagePage extends StatelessWidget {
                           ),
                           child: Column(
                             children: <Widget>[
-                              SizedBox(height: 20),
-                              Text(
+                              const SizedBox(height: 20),
+                              const Text(
                                 'Download your Data:',
                                 style: TextStyle(
                                     fontSize: 16, fontWeight: FontWeight.bold),
                               ),
-                              SizedBox(height: 10),
+                              const SizedBox(height: 10),
                               ElevatedButton.icon(
                                 onPressed: () {
                                   // Implement file download logic here (e.g., open the file).
                                 },
-                                icon: Icon(FontAwesome5.file_download),
-                                label: Text('Download File'),
+                                icon: const Icon(FontAwesome5.file_download),
+                                label: const Text('Download File'),
                                 style: ElevatedButton.styleFrom(
-                                  primary: Colors.green,
+                                  backgroundColor: Colors.green,
                                 ),
                               ),
-                              SizedBox(height: 10),
+                              const SizedBox(height: 10),
                               Container(
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(

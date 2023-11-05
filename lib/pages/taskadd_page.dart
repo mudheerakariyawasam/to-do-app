@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:to_do_app/models/task.dart';
 
 // void main() {
 //   runApp(MyApp());
@@ -19,15 +20,68 @@ class TaskManagementApp extends StatefulWidget {
 }
 
 class _TaskManagementAppState extends State<TaskManagementApp> {
-  List<Task> tasks = [];
+  List<TaskModel> tasks = [];
 
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController dueDateController = TextEditingController();
   int selectedPriority = 0; // Default priority is Low
 
+  String getPriorityText(int priority) {
+    switch (priority) {
+      case 0:
+        return 'Low';
+      case 1:
+        return 'Medium';
+      case 2:
+        return 'High';
+      default:
+        return 'Unknown';
+    }
+  }
+
+  void getTasks() async {
+    print('loading tasks');
+    var allTasks = TaskModel.read();
+    allTasks.forEach((task) {
+      setState(() {
+        // tasks.add(TaskModel.fromJson(task.data() as Map<String, dynamic>));
+        print(task);
+      });
+    });
+  }
+
+  void addTask() {
+    String title = titleController.text;
+    String description = descriptionController.text;
+    String dueDate = dueDateController.text;
+    int priority = selectedPriority;
+
+    TaskModel newTask = TaskModel.forTest(
+      title: title,
+      description: description,
+      dueDate: dueDate,
+      priority: priority,
+    );
+
+    try {
+      newTask.save();
+    } catch (e) {
+      print('error in saving' + e.toString());
+    }
+
+    setState(() {
+      tasks.add(newTask);
+      titleController.clear();
+      descriptionController.clear();
+      dueDateController.clear();
+      selectedPriority = 0; // Reset priority to Low
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    getTasks();
     return Scaffold(
       appBar: AppBar(
         title: Text('Task Management App'),
@@ -124,50 +178,7 @@ class _TaskManagementAppState extends State<TaskManagementApp> {
     );
   }
 
-  String getPriorityText(int priority) {
-    switch (priority) {
-      case 0:
-        return 'Low';
-      case 1:
-        return 'Medium';
-      case 2:
-        return 'High';
-      default:
-        return 'Unknown';
-    }
-  }
-
-  void addTask() {
-    String title = titleController.text;
-    String description = descriptionController.text;
-    String dueDate = dueDateController.text;
-    int priority = selectedPriority;
-    Task newTask = Task(
-      title: title,
-      description: description,
-      dueDate: dueDate,
-      priority: priority,
-    );
-    setState(() {
-      tasks.add(newTask);
-      titleController.clear();
-      descriptionController.clear();
-      dueDateController.clear();
-      selectedPriority = 0; // Reset priority to Low
-    });
-  }
+  
 }
 
-class Task {
-  final String title;
-  final String description;
-  final String dueDate;
-  final int priority;
 
-  Task({
-    required this.title,
-    required this.description,
-    required this.dueDate,
-    required this.priority,
-  });
-}
