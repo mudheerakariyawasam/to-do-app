@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:to_do_app/pages/auth_page.dart';
-import 'package:to_do_app/pages/dashboard_page.dart';
-import 'package:to_do_app/pages/datamanage_page.dart';
-import 'package:to_do_app/pages/taskadd_page.dart';
-import 'pages/login_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
@@ -23,6 +19,6 @@ class MyApp extends StatelessWidget {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: AuthPage(),
-    );
+);
   }
 }
