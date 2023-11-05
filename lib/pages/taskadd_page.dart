@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:to_do_app/models/task.dart';
+import 'package:to_do_app/services/notification_service.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -38,29 +39,26 @@ class _TaskManagementAppState extends State<TaskManagementApp> {
   }
 
   void getTasks() async {
-    Stream<QuerySnapshot<Map<String, dynamic>>> snapshot =
-        await TaskModel.readAll();
-    print('snapshot: $snapshot');
+    Stream<QuerySnapshot<Map<String, dynamic>>> snapshot = TaskModel.readAll();
     snapshot.listen((QuerySnapshot<Map<String, dynamic>> snapshot) {
       List<Map<String, dynamic>> documents =
           snapshot.docs.map((document) => document.data()).toList();
-      print('documents: $documents');
 
       try {
         List<TaskModel> tasks =
             documents.map((document) => TaskModel.fromJson(document)).toList();
-        print('tasks: $tasks');
+
         setState(() {
           this.tasks = tasks;
         });
       } catch (e) {
-        print('error in getting tasks' + e.toString());
+        debugPrint('error in getting tasks $e');
       }
     });
   }
 
   void addTask() {
-    print('adding task');
+    debugPrint('adding task');
     String title = titleController.text;
     String description = descriptionController.text;
     String dueDate = selectedDate != null
@@ -82,15 +80,35 @@ class _TaskManagementAppState extends State<TaskManagementApp> {
 
     try {
       newTask.save();
+
+      try {
+        // schedule notification if selected date is in the future
+        DateTime today = DateTime.now();
+        if (selectedDate != null && selectedDate!.isAfter(today)) {
+          // schedule notification to be sent on the selected date at 6am
+          DateTime scheduleTime = DateTime(selectedDate!.year,
+              selectedDate!.month, selectedDate!.day, 6, 0, 0);
+
+          NotificationService().scheduleNotification(
+              title: title,
+              body: description,
+              scheduledNotificationDateTime: scheduleTime);
+        } else {
+          NotificationService()
+              .showNotification(title: title, body: description);
+        }
+      } catch (e) {
+        debugPrint('error in scheduling notification $e');
+      }
       setState(() {
         titleController.clear();
         descriptionController.clear();
         selectedDate = null;
-        selectedPriority = 0; 
+        selectedPriority = 0;
         selectedCategory = null;
       });
     } catch (e) {
-      print('error in saving' + e.toString());
+      debugPrint('error in saving $e');
     }
   }
 
