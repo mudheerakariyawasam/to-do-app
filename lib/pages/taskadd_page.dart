@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:to_do_app/models/task.dart';
 import 'package:to_do_app/services/notification_service.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 void main() {
   runApp(MaterialApp(
@@ -18,6 +21,18 @@ class TaskManagementApp extends StatefulWidget {
 
 class _TaskManagementAppState extends State<TaskManagementApp> {
   List<TaskModel> tasks = [];
+  String? _selectedImagePath;
+
+  Future<void> _selectAttachment(BuildContext context) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImagePath = pickedFile.path;
+      });
+    }
+  }
 
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
@@ -123,6 +138,24 @@ class _TaskManagementAppState extends State<TaskManagementApp> {
             _buildCategorySelector(context),
             const SizedBox(height: 10),
             _buildPrioritySelection(),
+            const SizedBox(height: 20),
+            const SizedBox(height: 10),
+            const Row(
+              children: <Widget>[
+                Icon(Icons.attach_file,
+                    size: 28, color: Colors.blue), // Attachment icon
+                SizedBox(width: 10),
+              ],
+            ),
+            _selectedImagePath != null
+                ? Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Image.file(
+                      File(_selectedImagePath!),
+                      height: 100,
+                    ),
+                  )
+                : Container(),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
@@ -276,11 +309,62 @@ class _TaskManagementAppState extends State<TaskManagementApp> {
               _buildCategoryItem(TaskCategory.Academic, Colors.blue),
               _buildCategoryItem(TaskCategory.Work, Colors.orange),
               _buildCategoryItem(TaskCategory.Other, Colors.purple),
+              const SizedBox(height: 16), // Add some spacing
+              ElevatedButton(
+                onPressed: () {
+                  _showCreateLabelDialog(context);
+                },
+                child: const Text('Create Label'), // Button text
+              ),
             ],
           ),
           backgroundColor: Colors.white, // Change the background color
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0), // Add rounded corners
+          ),
+        );
+      },
+    );
+  }
+
+  void _showCreateLabelDialog(BuildContext context) {
+    String labelName = '';
+    Color selectedColor = Colors.red;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Create Label'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              TextField(
+                decoration: const InputDecoration(labelText: 'Label Name'),
+                onChanged: (value) {
+                  labelName = value;
+                },
+              ),
+              const SizedBox(height: 16),
+              const Text('Select Label Color:'),
+              ColorPicker(
+                pickerColor: selectedColor,
+                onColorChanged: (color) {
+                  selectedColor = color;
+                },
+                colorPickerWidth: 300.0,
+                pickerAreaHeightPercent: 0.7,
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  // Handle label creation logic here
+                  debugPrint('Label Name: $labelName, Color: $selectedColor');
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Create'),
+              ),
+            ],
           ),
         );
       },
