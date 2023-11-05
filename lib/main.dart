@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'pages/managetasks_page.dart';
+import 'pages/taskadd_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,7 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: TaskListScreen(),
+      home: TaskManagementApp(),
     );
   }
 }

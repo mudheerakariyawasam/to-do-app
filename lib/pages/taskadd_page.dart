@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -198,6 +199,14 @@ class _TaskManagementAppState extends State<TaskManagementApp> {
               _buildCategoryItem(TaskCategory.Academic, Colors.blue),
               _buildCategoryItem(TaskCategory.Work, Colors.orange),
               _buildCategoryItem(TaskCategory.Other, Colors.purple),
+              SizedBox(height: 16), // Add some spacing
+              ElevatedButton(
+                
+                 onPressed: () {
+                  _showCreateLabelDialog(context);
+                },
+                child: Text('Create Label'), // Button text
+              ),
             ],
           ),
           backgroundColor: Colors.white, // Change the background color
@@ -208,6 +217,51 @@ class _TaskManagementAppState extends State<TaskManagementApp> {
       },
     );
   }
+
+  void _showCreateLabelDialog(BuildContext context) {
+    String labelName = '';
+    Color selectedColor = Colors.red;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Create Label'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              TextField(
+                decoration: InputDecoration(labelText: 'Label Name'),
+                onChanged: (value) {
+                  labelName = value;
+                },
+              ),
+              SizedBox(height: 16),
+              Text('Select Label Color:'),
+              ColorPicker(
+                pickerColor: selectedColor,
+                onColorChanged: (color) {
+                  selectedColor = color;
+                },
+                colorPickerWidth: 300.0,
+                pickerAreaHeightPercent: 0.7,
+              ),
+              SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  // Handle label creation logic here
+                  print('Label Name: $labelName, Color: $selectedColor');
+                  Navigator.of(context).pop();
+                },
+                child: Text('Create'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
 
   Widget _buildCategoryItem(TaskCategory category, Color color) {
     return ListTile(
