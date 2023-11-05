@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:to_do_app/pages/home_page.dart';
+import 'package:to_do_app/pages/taskadd_page.dart';
 import 'package:to_do_app/pages/login_page.dart';
 
 class AuthPage extends StatelessWidget {
@@ -15,7 +15,7 @@ class AuthPage extends StatelessWidget {
             //user Logged In
 
             if (snapshot.hasData) {
-              return HomePage();
+              return TaskManagementApp();
             }
             //user not Logged In
             else {
