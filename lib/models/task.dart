@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:to_do_app/services/database_service.dart';
 
 class TaskModel {
@@ -5,9 +6,9 @@ class TaskModel {
   String title;
   String description;
   List<String> tags = [];
+  String category = '';
   int priority;
   String dueDate;
-  String dueTime ='';
   bool isCompleted = false;
   bool isReminderSet = false;
 
@@ -17,10 +18,9 @@ class TaskModel {
   TaskModel({
     required this.title,
     required this.description,
-    required this.tags,
-    required this.priority,
     required this.dueDate,
-    required this.dueTime,
+    required this.category,
+    required this.priority,
     required this.isCompleted,
   });
 
@@ -34,18 +34,17 @@ class TaskModel {
   TaskModel.fromJson(Map<String, dynamic> json)
       : title = json['title'],
         description = json['description'],
-        tags = json['tags'].cast<String>(),
+        dueDate = json['dueDate'],
+        category = json['category'],
         priority = json['priority'],
-        dueDate = json['date'],
-        dueTime = json['time'],
         isCompleted = json['isCompleted'];
 
   Map<String, dynamic> toJson() => {
         'title': title,
         'description': description,
-        'tags': tags,
-        'date': dueDate,
-        'time': dueTime,
+        'dueDate': dueDate,
+        'category': category,
+        'priority': priority,
         'isCompleted': isCompleted,
       };
 
@@ -65,10 +64,8 @@ class TaskModel {
   }
 
   // get all tasks from database
-  static Stream<List<TaskModel>> read() {
-    return _db.read(collection).map((snapshot) => snapshot.docs
-        .map((document) => TaskModel.fromJson(document.data()))
-        .toList());
+  static Stream<QuerySnapshot<Map<String, dynamic>>> readAll() {
+    return _db.readAll(collection);
   }
 
   // get task by id from database
@@ -76,6 +73,4 @@ class TaskModel {
     return _db.readById(collection, id).map((snapshot) =>
         TaskModel.fromJson(snapshot.data() as Map<String, dynamic>));
   }
-
-
 }
