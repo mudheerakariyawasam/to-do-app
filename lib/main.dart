@@ -4,6 +4,7 @@ import 'package:to_do_app/pages/datamanage_page.dart';
 import 'package:to_do_app/pages/taskadd_page.dart';
 import 'pages/login_page.dart';
 import 'pages/filter_page.dart';
+import 'pages/managetasks_page.dart';
 
 void main() {
   runApp(const MyApp());
