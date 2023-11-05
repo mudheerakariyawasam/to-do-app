@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:to_do_app/models/task.dart';
+import 'package:to_do_app/pages/managetasks_page.dart';
 import 'package:to_do_app/services/notification_service.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:image_picker/image_picker.dart';
@@ -166,11 +167,26 @@ class _TaskManagementAppState extends State<TaskManagementApp> {
                 style: TextStyle(fontSize: 18),
               ),
             ),
-            const SizedBox(height: 20),
-            const Text(
-              'Task List',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ElevatedButton(
+              onPressed: () {
+                // Navigate to view tasks page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TaskListScreen(),
+                  ),
+                );
+              },
+              child: const Text(
+                'View Tasks',
+                style: TextStyle(fontSize: 18),
+              ),
             ),
+            const SizedBox(height: 20),
+            // const Text(
+            //   'Task List',
+            //   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            // ),
             Expanded(
               child: ListView.builder(
                 itemCount: tasks.length,
